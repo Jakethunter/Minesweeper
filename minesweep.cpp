@@ -6,6 +6,7 @@ class tile {
     public:
         char apperance = '#';
         bool hasbomb = 0;
+        int value = 0;
         int bombcount;
 };
 
@@ -30,18 +31,60 @@ class grid {
                 }
                 std::cout << '\n';
             }   
+            std::cout << '\n';
+        }
+        int revealspot(){
+            int x;
+            int y;
+            std::cout << "enter x";
+            std::cin >> x;
+            std::cout << "enter y";
+            std::cin >> y;
+            std::cout << '\n';
+            x -= 1;
+            y -= 1;
+            if (field[y][x].value >= 9)
+            {
+                std::cout << "mine exploded!";
+                return 1;
+            } else {
+                field[y][x].apperance =  field[y][x].value + '0';
+                printfield();
+                return 0;
+            }       
         }
         void setBombs(){
-            //grab random coordinates
-            //check if coordinates are a bomb
-            //if no set it to a bomb
-            //if it is then dont increase i. 
             for (int i = 0; i < bombs;) {
                 int x = xdist(gen);
                 int y = ydist(gen);
-               if (field[y][x].hasbomb == 0)
-               {
+               if (field[y][x].hasbomb == 0) {
                 field[y][x].hasbomb = 1;
+                field[y][x].value = 9;
+                //chopped
+                if(x != 0){
+                    field[y][x - 1].value += 1;
+                }
+                if(x != width - 1){
+                    field[y][x + 1].value += 1;
+                }
+                 if(y != 0){
+                    field[y - 1][x].value += 1;
+                }
+                 if(y != height - 1){
+                    field[y + 1][x].value += 1;
+                }
+                if(x != 0 && y != 0){
+                    field[y - 1][x - 1].value += 1;
+                }
+                if(x != width - 1 && y != 0){
+                    field[y - 1][x + 1].value += 1;
+                }
+                if(x != 0 && y != height - 1){
+                    field[y + 1][x - 1].value += 1;
+                }
+                if(x != width - 1 && y != height - 1){
+                    field[y + 1][x + 1].value += 1;
+                }
                 i++;
                }
             }
@@ -72,6 +115,8 @@ int main() {
     grid mainGrid(localwidth, localheight, bombcount);
     mainGrid.printfield();
     mainGrid.setBombs();
-    mainGrid.printfield();
+
+    while (mainGrid.revealspot() == 0){}
+    
     return 0;
 }
